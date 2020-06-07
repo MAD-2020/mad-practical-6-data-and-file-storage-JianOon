@@ -1,16 +1,15 @@
 package sg.edu.np.week_6_whackamole_3_0;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +20,13 @@ public class MainActivity extends AppCompatActivity {
            accordingly via Toastbox if user does not exist. This loads the level selection page.
         4. There is an option to create a new user account. This loads the create user page.
      */
+    Button enter;
+    EditText lname;
+    EditText lpw;
+    String lName;
+    String lPW;
+    TextView register;
+    MyDBHandler db = new MyDBHandler(this, null, null, 1);
     private static final String FILENAME = "MainActivity.java";
     private static final String TAG = "Whack-A-Mole3.0!";
 
@@ -28,6 +34,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        enter = findViewById(R.id.login);
+        lname = findViewById(R.id.name);
+        lpw = findViewById(R.id.password);
+        register = findViewById(R.id.register);
+        enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lName = lname.getText().toString();
+                lPW = lpw.getText().toString();
+
+                boolean temp = isValidUser(lName, lPW);
+                if (temp == false) {
+                    Toast.makeText(getApplicationContext(), "Invalid Username or Password", Toast.LENGTH_SHORT).show();
+
+                }
+                else{
+                    Intent activityName = new Intent(MainActivity.this, Main3Activity.class);
+                    activityName.putExtra("Username",lName);
+                    startActivity(activityName);
+
+
+                }
+
+
+            }
+
+        });
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent activityName = new Intent(MainActivity.this, Main2Activity.class);
+
+                startActivity(activityName);
+
+            }
+        });
+
 
         /* Hint:
             This method creates the necessary login inputs and the new user creation ontouch.
@@ -42,19 +85,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         finish();
     }
+    public boolean isValidUser(String userName, String password) {
+        Log.v("CHECK", userName);
+        Log.v("CHECK", password);
+        UserData user = db.findUser(userName);
+        if (user != null) {
+            String compare = user.getMyPassword();
+            Log.v("CHECK", String.valueOf(compare.equals(password)));
+            if (compare.equals(password)) {
+                return true;
+            } else {
+                return false;
+            }
 
-    public boolean isValidUser(String userName, String password){
 
-        /* HINT:
-            This method is called to access the database and return a true if user is valid and false if not.
-            Log.v(TAG, FILENAME + ": Running Checks..." + dbData.getMyUserName() + ": " + dbData.getMyPassword() +" <--> "+ userName + " " + password);
-            You may choose to use this or modify to suit your design.
-         */
+        }
+        else{
+            return false;
+        }
+
 
     }
-
 }
+
+

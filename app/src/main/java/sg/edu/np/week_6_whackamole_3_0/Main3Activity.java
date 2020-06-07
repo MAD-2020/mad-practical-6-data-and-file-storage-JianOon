@@ -1,15 +1,16 @@
 package sg.edu.np.week_6_whackamole_3_0;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import java.util.ArrayList;
 
 public class Main3Activity extends AppCompatActivity {
     /* Hint:
@@ -25,9 +26,12 @@ public class Main3Activity extends AppCompatActivity {
             e. Each location of the mole is randomised.
         5. There is an option return to the login page.
      */
+    ArrayList<Integer> scorelist;
+    ArrayList<Integer> levellist;
+    Button back;
     private static final String FILENAME = "Main3Activity.java";
     private static final String TAG = "Whack-A-Mole3.0!";
-
+    MyDBHandler db = new MyDBHandler(this, null, null, 1);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +42,26 @@ public class Main3Activity extends AppCompatActivity {
 
         Log.v(TAG, FILENAME + ": Show level for User: "+ userName);
          */
+        Intent receivingEnd = getIntent();
+        String name= receivingEnd.getStringExtra("Username");
+        UserData user = db.findUser(name);
+        UserData userz = db.getlnS(user);
+        RecyclerView recyclerView = findViewById(R.id.rview);
+        CustomScoreAdaptor mAdapter = new CustomScoreAdaptor(userz,this);
+        LinearLayoutManager mLayoutManager =   new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+        back = findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent activityName = new Intent(Main3Activity.this, MainActivity.class);
+                startActivity(activityName);
+            }
+        });
+
+
     }
 
     @Override
